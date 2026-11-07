@@ -20819,7 +20819,7 @@ var DEMO_STEPS = {
   11: () => [{ op: "claim", handle: "tayo", slotId: "rolls", item: "Rolls" }],
   12: () => [{ op: "lock" }]
 };
-var BASE = Date.UTC(2026, 10, 20, 18, 0, 0);
+var BASE = Date.UTC(2026, 10, 6, 18, 0, 0);
 var at = (i) => new Date(BASE + i * 6e4).toISOString();
 function runDemo(slug, steps, extra = []) {
   let tick = 0;

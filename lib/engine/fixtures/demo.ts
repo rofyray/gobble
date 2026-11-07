@@ -56,7 +56,7 @@ export const DEMO_STEPS: Record<number, Step> = {
   12: () => [{ op: 'lock' }],
 };
 
-const BASE = Date.UTC(2026, 10, 20, 18, 0, 0);
+const BASE = Date.UTC(2026, 10, 6, 18, 0, 0);
 const at = (i: number) => new Date(BASE + i * 60_000).toISOString();
 
 /** Builds an event by running the given steps in order. Extra ops run after them. */
