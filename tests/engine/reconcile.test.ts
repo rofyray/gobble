@@ -48,14 +48,14 @@ describe('slot gaps', () => {
     expect(ids(r)).not.toContain('SHORTFALL:dessert');
   });
 
-  it('E6: two 10-serving mashed potatoes is a double of the later claim, with a swap', () => {
+  it('E6: two 10-serving mashed potatoes is a double of the later claim, with the next open slot as swap', () => {
     const r = run(newEvent(),
       { op: 'claim', handle: 'kia', slotId: 'mashed-potatoes', item: 'Mashed potatoes' },
       { op: 'claim', handle: 'kunda', slotId: 'mashed-potatoes', item: 'Mashed potatoes' });
     const gap = r.report.gaps.find((g) => g.id === 'DOUBLED:mashed-potatoes')!;
     expect(gap.severity).toBe('warning');
     expect(gap.claimIds).toEqual([claimId(r, 'kunda', 'mashed-potatoes')]);
-    expect(gap.swapTo).toBe('turkey');
+    expect(gap.swapTo).toBe('gravy');
     expect(gap.askHandles[0]).toBe('kunda');
   });
 
