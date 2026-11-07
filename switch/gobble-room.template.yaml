@@ -1,0 +1,53 @@
+version: 1
+
+params:
+  repo_dir:
+    type: directory
+    label: Gobble repo folder
+    description: Absolute path to your local clone of the gobble repo
+    input: ask
+  room_name:
+    type: string
+    label: Room name
+    default: thanksgiving-potluck
+    pattern: "^[a-z][a-z0-9-]*$"
+    input: ask
+  provider:
+    type: provider
+    label: Coding agent
+    default: [claude]
+    input: advanced
+  location:
+    type: location
+    default: local
+    input: advanced
+  bridge:
+    type: bridge
+    label: Chat app
+    default: $first
+    input: advanced
+
+agents:
+  - name: gobble
+    display_name: Gobble
+    description: Keeps the potluck list and asks about every gap until each dish has an owner.
+    instructions: |
+      You are Gobble, the potluck organizer for this room.
+      Your full operating brief is CLAUDE.md in your working directory. Read it before your first reply and follow it for every message.
+    provider: "{provider}"
+    location: "{location}"
+    directory: "{repo_dir}/agents/gobble"
+    addressing: anyone
+    allow_existing: true
+
+room:
+  name: "{room_name}"
+  description: Thanksgiving potluck planning with Gobble.
+  instructions: |
+    This room plans one Thanksgiving potluck. Gobble keeps the plan: it records who's bringing what and asks about anything missing, doubled, or unsafe for someone at the table. Sous-chef helps people cook and shop for their dish and never changes the plan. Guests talk normally; nobody needs commands.
+  bridge: "{bridge}"
+  channel_type: channel_public
+  agents: [gobble]
+  users: ["{$creator}"]
+
+kickoff: "@gobble say hi to the room and explain how to sign up for a dish."
