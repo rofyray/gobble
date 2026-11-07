@@ -1,0 +1,9 @@
+prd.md
+docs
+.gobble
+.gobble-data
+agents/*/.env
+.env
+.env.local
+test-results
+playwright-report
