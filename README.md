@@ -6,7 +6,13 @@ Gobble is a potluck organizer that lives in your group chat. Guests say what the
 
 Built for the WeMakeDevs **Flip the Switch** hackathon on [Switch](https://docs.switchagents.ai/).
 
-**Demo video and write-up:** https://rofyray.github.io/gobble/ · **Site:** https://gobble-board.vercel.app · **Live board:** https://gobble-board.vercel.app/e/demo · **Mid-plan board:** https://gobble-board.vercel.app/e/demo-mid
+| Link | Where |
+|---|---|
+| Demo video and write-up | https://rofyray.github.io/gobble/ |
+| Site | https://gobble-board.vercel.app |
+| Live board (finished plan) | https://gobble-board.vercel.app/e/demo |
+| Mid-plan board | https://gobble-board.vercel.app/e/demo-mid |
+| Code | https://github.com/rofyray/gobble |
 
 [![Gobble demo: every dish gets an owner](https://rofyray.github.io/gobble/poster.png)](https://rofyray.github.io/gobble/)
 
@@ -22,29 +28,52 @@ Without Switch, Gobble has no room, no people and no routing.
 ## How it works
 
 ```mermaid
-flowchart LR
-  subgraph Mac["Host machine"]
-    MM["Mattermost (bundled)\nroom: thanksgiving-potluck"]
-    SW["Switch local server\n+ Switch Console"]
-    G["Gobble\nClaude Code session\ncwd: agents/gobble"]
-    SC["Sous-chef\nClaude Code session\ncwd: agents/sous-chef"]
-    CLI["./gobble CLI\n(bin/gobble.mjs)"]
-    FS[(".gobble-data/*.json\nlocal mode")]
+flowchart TB
+  subgraph chat["GROUP CHAT (Mattermost)"]
+    direction LR
+    host["Host<br/><i>15 people, dinner at 4</i>"]
+    guests["Guests<br/><i>pecan pie from me!</i>"]
   end
-  subgraph Vercel
-    API["Next.js API\n/api/events/*"]
-    BOARD["Potluck Board\n/e/[slug]"]
-    R[("Upstash Redis")]
+
+  subgraph mac["HOST MACHINE"]
+    direction LR
+    switch{{"Switch<br/>room routing"}}
+    gobble["Gobble<br/>Claude Code agent<br/><i>keeps the plan</i>"]
+    chef["Sous-chef<br/>Claude Code agent<br/><i>recipes and shopping lists</i>"]
+    cli["./gobble CLI<br/>deterministic engine<br/><i>counts, gaps, oven, allergens</i>"]
+    local[("Local JSON store<br/><i>local mode</i>")]
   end
-  MM <--> SW
-  SW <--> G
-  SW <--> SC
-  G -- "Bash" --> CLI
-  SC -- "Bash (read-only)" --> CLI
-  CLI -- "local mode" --> FS
-  CLI -- "remote mode (HTTPS + bearer)" --> API
-  API --> R
-  BOARD -- "poll 2.5s" --> API
+
+  subgraph cloud["VERCEL"]
+    direction LR
+    api["Next.js API"]
+    redis[("Upstash Redis")]
+    board["Potluck board<br/><i>live ticket rail</i>"]
+  end
+
+  host & guests <-->|messages| switch
+  switch <-->|every untagged message| gobble
+  switch <-.->|"@sous-chef"| chef
+  gobble -->|claims and updates| cli
+  chef -.->|read only| cli
+  cli -.->|local mode| local
+  cli ==>|HTTPS + token| api
+  api <--> redis
+  board -->|polls every 2.5 s| api
+
+  classDef person fill:#ede6da,stroke:#6a5f54,color:#221d18
+  classDef agent fill:#f2b544,stroke:#8c5300,color:#221d18,font-weight:bold
+  classDef engine fill:#f3ede0,stroke:#c2361f,color:#221d18,stroke-width:2px
+  classDef infra fill:#f3ede0,stroke:#6a5f54,color:#221d18
+  classDef route fill:#4f6b47,stroke:#2f4229,color:#f3ede0,font-weight:bold
+  class host,guests person
+  class gobble,chef agent
+  class cli engine
+  class api,redis,board,local infra
+  class switch route
+  style chat fill:#2b241e,stroke:#3a322b,color:#ede6da
+  style mac fill:#1c1814,stroke:#3a322b,color:#ede6da
+  style cloud fill:#1c1814,stroke:#3a322b,color:#ede6da
 ```
 
 1. Gobble reads each message and turns claims into `./gobble` CLI calls.
@@ -82,7 +111,12 @@ cd agents/gobble
 ./gobble status --pretty
 ```
 
-To deploy: import the repo in Vercel, add Upstash Redis from the Marketplace, set `GOBBLE_AGENT_TOKEN` and `NEXT_PUBLIC_SITE_URL`, then set `GOBBLE_API_URL` and `GOBBLE_AGENT_TOKEN` in `agents/gobble/.env` and `agents/sous-chef/.env`.
+To deploy:
+
+1. Import the repo in Vercel.
+2. Add Upstash Redis from the Vercel Marketplace.
+3. In Vercel, set `GOBBLE_AGENT_TOKEN` and `NEXT_PUBLIC_SITE_URL`, then deploy.
+4. In both `agents/gobble/.env` and `agents/sous-chef/.env`, set `GOBBLE_API_URL` to your Vercel URL and `GOBBLE_AGENT_TOKEN` to the same token.
 
 ## Tests
 
