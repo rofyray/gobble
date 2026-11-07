@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Building Gobble: a potluck agent for the group chat</title>
+<meta name="description" content="How I built Gobble, a Thanksgiving potluck agent that keeps the list in a Switch room and asks the right person about every gap.">
+<meta property="og:title" content="Building Gobble: a potluck agent for the group chat">
+<meta property="og:description" content="A Thanksgiving potluck agent that keeps the list in your group chat. Built on Switch with Claude Code.">
+<meta property="og:image" content="https://rofyray.github.io/gobble/poster.png">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --range: #1c1814; --range-2: #24201b; --line: #3a322b;
+    --ticket: #f3ede0; --ink: #221d18; --ink-soft: #6a5f54;
+    --on: #ede6da; --on-soft: #a99e91; --gold: #f2b544; --red: #c2361f; --ok: #4f6b47;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--range); color: var(--on); font: 18px/1.7 'IBM Plex Sans', system-ui, sans-serif; }
+  a { color: var(--gold); text-underline-offset: 3px; }
+  a:hover { text-decoration-thickness: 2px; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 20px; }
+  header { padding: 56px 0 28px; }
+  .kicker { font: 500 13px/1.4 'IBM Plex Mono', monospace; letter-spacing: .16em; text-transform: uppercase; color: var(--gold); margin: 0 0 18px; }
+  h1 { font: 800 clamp(44px, 9vw, 76px)/.92 'Barlow Condensed', sans-serif; text-transform: uppercase; margin: 0 0 20px; letter-spacing: -.005em; }
+  .dek { font-size: 20px; color: var(--on-soft); margin: 0; }
+  .meta { font: 400 13px 'IBM Plex Mono', monospace; color: var(--on-soft); margin-top: 22px; }
+  figure.video { margin: 12px auto 8px; max-width: 1040px; padding: 0 20px; }
+  video { width: 100%; display: block; border: 1px solid var(--line); background: #111; aspect-ratio: 16 / 9; }
+  figcaption { font: 400 13px 'IBM Plex Mono', monospace; color: var(--on-soft); margin-top: 10px; text-align: center; }
+  main { padding-bottom: 72px; }
+  h2 { font: 700 34px/1.05 'Barlow Condensed', sans-serif; text-transform: uppercase; margin: 56px 0 14px; letter-spacing: .01em; }
+  p, li { color: var(--on); }
+  ul { padding-left: 22px; }
+  li { margin: 6px 0; }
+  code { font: 400 .86em 'IBM Plex Mono', monospace; background: var(--range-2); border: 1px solid var(--line); padding: 1px 6px; border-radius: 4px; }
+  pre { background: #120f0c; border: 1px solid var(--line); padding: 16px 18px; overflow-x: auto; font: 400 14px/1.6 'IBM Plex Mono', monospace; border-radius: 6px; }
+  pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+  .chat { background: var(--range-2); border: 1px solid var(--line); border-radius: 8px; padding: 6px 18px; margin: 22px 0; }
+  .msg { display: grid; grid-template-columns: 72px 1fr; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 16px; line-height: 1.55; }
+  .msg:last-child { border-bottom: 0; }
+  .who { font: 500 13px 'IBM Plex Mono', monospace; color: var(--on-soft); padding-top: 3px; }
+  .who.bot { color: var(--gold); }
+  .ticket { background: var(--ticket); color: var(--ink); padding: 20px 22px; margin: 26px 0; box-shadow: 0 8px 0 -3px rgba(0,0,0,.4); border-top: 10px solid #9aa0a6; }
+  .ticket p { color: var(--ink); margin: 0; }
+  .ticket .label { font: 500 12px 'IBM Plex Mono', monospace; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 8px; }
+  footer { border-top: 1px solid var(--line); padding: 28px 0 48px; font: 400 14px 'IBM Plex Mono', monospace; color: var(--on-soft); }
+  footer a { margin-right: 18px; }
+  @media (max-width: 560px) {
+    body { font-size: 17px; }
+    .msg { grid-template-columns: 1fr; gap: 2px; }
+  }
+</style>
+</head>
+<body>
+<header class="wrap">
+  <p class="kicker">Flip the Switch hackathon · #HowISwitch</p>
+  <h1>Every dish gets an owner</h1>
+  <p class="dek">Building Gobble, a Thanksgiving potluck agent that keeps the list in your group chat and asks the right person about every gap.</p>
+  <p class="meta">By Rofy · November 2026 · <a href="https://github.com/rofyray/gobble">github.com/rofyray/gobble</a></p>
+</header>
+
+<figure class="video">
+  <video controls preload="metadata" playsinline poster="poster.png">
+    <source src="gobble-demo.mp4" type="video/mp4">
+    Your browser can't play this video. <a href="gobble-demo.mp4">Download it</a> instead.
+  </video>
+  <figcaption>The full demo, 1:09: one host, four guests, two agents, one Switch room.</figcaption>
+</figure>
+
+<main class="wrap">
+
+<h2>The problem</h2>
+<p>A potluck plan usually lives in a group chat. People reply with what they're bringing and the thread scrolls on. Nobody keeps the list. You find out on the day that there are three pies and no gravy, that two people made mashed potatoes, that a dish needs the oven during the four hours the turkey is in it, or that the only dessert has nuts and one guest can't eat them.</p>
+<p>The fix people reach for is a spreadsheet, and nobody fills in a spreadsheet. I wanted the list to keep itself while everyone kept talking the way they already do.</p>
+
+<h2>What Gobble does</h2>
+<p>Gobble is an agent that sits in the chat room. The host posts the basics once. After that, guests just talk, and Gobble records each claim and checks the plan against the headcount, diets, allergies and oven time. When something is missing, doubled or unsafe, it asks one person about that one thing.</p>
+<p>Here's a stretch of the run in the video:</p>
+
+<div class="chat">
+  <div class="msg"><span class="who">kia</span><span>pecan pie from me! and I can do mashed potatoes</span></div>
+  <div class="msg"><span class="who">cee</span><span>heads up, tree nut allergy here. I'll grab drinks</span></div>
+  <div class="msg"><span class="who bot">gobble</span><span>Drinks are yours, @cee, and that's noted. Heads up: there's a tree-nut allergy at the table, and the pecan pie has tree nuts. @kia, can you label it and keep it on its own plate?</span></div>
+  <div class="msg"><span class="who">kunda</span><span>mine's pumpkin pie, no nuts. I'll do mashed potatoes too</span></div>
+  <div class="msg"><span class="who bot">gobble</span><span>Pumpkin pie is yours, @kunda, so there's a nut-free dessert on the table. @kia and @kunda both have mashed potatoes. @kunda, want to switch to a green veg? Nobody's on it yet.</span></div>
+</div>
+
+<p>Cee says they have the allergy, and Gobble records it, but the warning it posts never names them. The board shows the table's allergies as counts with no names attached. When every dish has an owner, Gobble posts the final list and asks the host whether to lock the plan.</p>
+<p>Then Gobble hands off to Sous-chef, a second agent in the same room. Sous-chef answers kitchen questions for whoever asks: a recipe scaled to what you signed up for, or a shopping list. It can read the plan but can't change it.</p>
+
+<h2>The model talks, the engine counts</h2>
+<p>The design decision that mattered most: the language model never does arithmetic.</p>
+<p>Gobble is a Claude Code session. Its brief is a <code>CLAUDE.md</code> file in its working folder, and it has one tool that matters, a small CLI called <code>./gobble</code>. When kia says "pecan pie from me", Gobble runs something like this:</p>
+<pre><code>./gobble claim kia dessert --item "Pecan pie" --tags contains-tree-nuts</code></pre>
+<p>The CLI writes the claim and runs a deterministic reconciliation engine over the whole plan. The engine knows that a pie serves about 8, that 15 guests need about 15 servings of dessert, that the turkey occupies the oven from 11:30 to 3:30 for a 4:00 dinner, and which dishes carry which allergens. It returns a list of gaps in priority order: unclaimed dishes, shortfalls, doubles, uncovered diets, allergen conflicts and oven clashes. Gobble's job is to read that list and ask about the top item in plain words.</p>
+<p>So when Gobble says "we're about 7 servings short for 15 people", that number came from code with unit tests, and the model only had to phrase the question. The same plan feeds a live board on Vercel, styled as a kitchen ticket rail, which polls every few seconds while the chat runs.</p>
+
+<div class="ticket">
+  <p class="label">Why split it this way</p>
+  <p>An agent that is wrong about the gravy once loses the room. Counting servings, timing an oven and matching allergens are problems with right answers, so they live in code. Reading "oh true, I'll bake it at home and bring it hot" and knowing that means "set oven time to zero" is a language problem, so it lives in the model.</p>
+</div>
+
+<h2>Where Switch fits</h2>
+<p>Switch is what puts an agent into a real group chat with real people. Gobble wouldn't have a room or any routing without it. Four Switch features carry the project:</p>
+<ul>
+  <li><strong>A room template.</strong> One YAML file in the repo creates the room, both agents, their instructions and a kickoff message. Setting up a fresh room for the demo took about a minute.</li>
+  <li><strong><code>!assign-agent @gobble</code>.</strong> Every message without an @mention goes to Gobble. Guests never type a command or tag a bot, which is the whole point for a group of relatives.</li>
+  <li><strong>Two agents in one room.</strong> Gobble hands off to Sous-chef with an ordinary @mention, and both see the same conversation.</li>
+  <li><strong>Claude Code as the runtime.</strong> Each agent runs in its own folder in the repo and picks up its own <code>CLAUDE.md</code>, so the full prompt is versioned in git and the Switch instructions field is a one-line pointer to it.</li>
+</ul>
+<p>The room in the demo runs on the Mattermost server that Switch Console sets up locally.</p>
+
+<h2>What tripped me up</h2>
+<p>Most of the hard parts were in setup.</p>
+<p><strong>Renaming a chat account.</strong> I renamed my Mattermost user from <code>user</code> to <code>rofy</code> partway through. Mattermost picked up the new name right away, but Gobble kept calling me @user and the plan was titled "Thanksgiving at User's". Switch saves the username it first sees for each person and, by design, never replaces one name with another. Fixing it took a database update and a restart of Switch's local server, and the rename also unlinked my account in Switch Console until I linked it again. If you're setting up a demo, pick your chat username before you send the first message.</p>
+<p><strong>Template inputs.</strong> The template's <code>$first</code> default for the chat app didn't resolve on my server, and the directory input re-filled itself on every keystroke. The template in the repo now names Mattermost directly and uses a plain text field for the folder.</p>
+<p><strong>Progress messages in the chat.</strong> Switch posts status lines like "Worked for 11s. 2 tool calls." into the room while an agent works. They help while testing. I couldn't find a setting to hide them for a demo.</p>
+
+<h2>Try it</h2>
+<p>The code, the room template and setup steps are on GitHub. You'll need Node 22, pnpm, Docker, Switch Console and Claude Code. The CLI and board also run without any agent, so you can drive a plan by hand:</p>
+<pre><code>cd agents/gobble
+./gobble init --title "Thanksgiving at Rofy's" --date 2026-11-26 --dinner 16:00 --headcount 15 --host rofy --pretty
+./gobble claim kia dessert --item "Pecan pie" --tags contains-tree-nuts
+./gobble status --pretty</code></pre>
+<p>Or look at a finished plan on the <a href="https://gobble-board.vercel.app/e/demo">live demo board</a>.</p>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <a href="https://github.com/rofyray/gobble">Code</a>
+    <a href="https://gobble-board.vercel.app/e/demo">Live board</a>
+    <a href="https://gobble-board.vercel.app">Site</a>
+    <a href="https://docs.switchagents.ai/">Switch</a>
+  </div>
+</footer>
+</body>
+</html>
