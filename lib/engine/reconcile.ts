@@ -144,9 +144,11 @@ function slotGaps(ctx: Ctx, gaps: Gap[]) {
       const recent = claims[claims.length - 1];
       const rest = claims.slice(0, -1);
       if (coveredBy(event, slot, rest)) {
-        const swap = [...event.slots]
+        // Suggest the next open required slot after this one on the menu, wrapping around.
+        const open = [...event.slots]
           .sort((a, b) => a.order - b.order)
-          .find((s) => isRequired(event, s) && (ctx.claimsBySlot.get(s.id) ?? []).length === 0);
+          .filter((s) => isRequired(event, s) && (ctx.claimsBySlot.get(s.id) ?? []).length === 0);
+        const swap = open.find((s) => s.order > slot.order) ?? open[0];
         gaps.push(makeGap(ctx, {
           id: `DOUBLED:${slot.id}`, kind: 'DOUBLED', slotId: slot.id, category: slot.category,
           claimIds: [recent.id],

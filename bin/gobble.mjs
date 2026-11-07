@@ -20119,7 +20119,8 @@ function slotGaps(ctx, gaps) {
       const recent = claims[claims.length - 1];
       const rest = claims.slice(0, -1);
       if (coveredBy(event, slot, rest)) {
-        const swap = [...event.slots].sort((a, b) => a.order - b.order).find((s) => isRequired(event, s) && (ctx.claimsBySlot.get(s.id) ?? []).length === 0);
+        const open2 = [...event.slots].sort((a, b) => a.order - b.order).filter((s) => isRequired(event, s) && (ctx.claimsBySlot.get(s.id) ?? []).length === 0);
+        const swap = open2.find((s) => s.order > slot.order) ?? open2[0];
         gaps.push(makeGap(ctx, {
           id: `DOUBLED:${slot.id}`,
           kind: "DOUBLED",

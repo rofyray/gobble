@@ -83,6 +83,8 @@ describe('Section 17 script through the CLI', () => {
     await gobble(`update ${claimOf(v, 'kunda', 'dessert')} --item "Pumpkin pie"`);
     v = await gobble('claim kunda mashed-potatoes --item "Mashed potatoes"');
     expect(v.fresh.map((g) => g.id)).toEqual(['DOUBLED:mashed-potatoes']);
+    expect(v.next?.id).toBe('UNCLAIMED_REQUIRED:stuffing');
+    expect((v as unknown as { fresh: { swapTo?: string }[] }).fresh[0].swapTo).toBe('green-veg');
 
     // 9. kunda switches to green beans
     v = await gobble(`update ${claimOf(v, 'kunda', 'mashed-potatoes')} --slot green-veg --item "Green beans"`);
