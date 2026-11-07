@@ -6,7 +6,9 @@ Gobble is a potluck organizer that lives in your group chat. Guests say what the
 
 Built for the WeMakeDevs **Flip the Switch** hackathon on [Switch](https://docs.switchagents.ai/).
 
-**Demo video:** https://youtu.be/eijHeX7oxGg · **Site:** https://gobble-board.vercel.app · **Live board:** https://gobble-board.vercel.app/e/demo · **Mid-plan board:** https://gobble-board.vercel.app/e/demo-mid
+**Demo video and write-up:** https://rofyray.github.io/gobble/ · **Site:** https://gobble-board.vercel.app · **Live board:** https://gobble-board.vercel.app/e/demo · **Mid-plan board:** https://gobble-board.vercel.app/e/demo-mid
+
+[![Gobble demo: every dish gets an owner](https://rofyray.github.io/gobble/poster.png)](https://rofyray.github.io/gobble/)
 
 ## How Switch is used
 
