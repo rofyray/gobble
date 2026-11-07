@@ -1,0 +1,6 @@
+{
+  "permissions": {
+    "allow": ["Bash(./gobble status:*)", "Bash(./gobble final:*)"],
+    "deny": ["Bash(curl:*)", "Bash(rm:*)", "Bash(git:*)"]
+  }
+}
