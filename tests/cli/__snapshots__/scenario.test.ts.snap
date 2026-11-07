@@ -1,0 +1,31 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Section 17 script through the CLI > ends ready with the expected final card 1`] = `
+"🦃 ORDER UP · Thanksgiving at Rofy's
+Thursday Nov 26 · dinner 4:00 PM · 15 guests
+
+MAINS
+- Turkey (@rofy)
+- Vegetarian main: Mushroom wellington (@tayo) · vegetarian
+SIDES
+- Stuffing (@cee)
+- Mashed potatoes (@kia)
+- Gravy (@rofy)
+- Cranberry sauce (@rofy)
+- Green vegetable: Green beans (@kunda)
+BREAD
+- Rolls (@tayo)
+DESSERT
+- Dessert: Pumpkin pie (@kunda)
+- Dessert: Pecan pie (@kia) · labeled, contains tree nuts
+DRINKS
+- Soft drinks: Drinks (@cee)
+SUPPLIES
+- Ice (@rofy)
+- Plates and cutlery (@rofy)
+
+OVEN
+- Turkey 11:30 AM to 3:30 PM
+
+Board: http://localhost:3000/e/<slug>"
+`;
