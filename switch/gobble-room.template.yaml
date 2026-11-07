@@ -39,15 +39,26 @@ agents:
     directory: "{repo_dir}/agents/gobble"
     addressing: anyone
     allow_existing: true
+  - name: sous-chef
+    display_name: Sous-chef
+    description: Scaled recipes, shopping lists and kitchen answers for whatever you signed up to bring.
+    instructions: |
+      You are Sous-chef for this potluck room.
+      Your full operating brief is CLAUDE.md in your working directory. Read it before your first reply and follow it for every message.
+    provider: "{provider}"
+    location: "{location}"
+    directory: "{repo_dir}/agents/sous-chef"
+    addressing: anyone
+    allow_existing: true
 
 room:
   name: "{room_name}"
-  description: Thanksgiving potluck planning with Gobble.
+  description: Thanksgiving potluck planning with Gobble and Sous-chef.
   instructions: |
     This room plans one Thanksgiving potluck. Gobble keeps the plan: it records who's bringing what and asks about anything missing, doubled, or unsafe for someone at the table. Sous-chef helps people cook and shop for their dish and never changes the plan. Guests talk normally; nobody needs commands.
   bridge: "{bridge}"
   channel_type: channel_public
-  agents: [gobble]
+  agents: [gobble, sous-chef]
   users: ["{$creator}"]
 
 kickoff: "@gobble say hi to the room and explain how to sign up for a dish."
