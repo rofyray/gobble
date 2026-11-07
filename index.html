@@ -26,6 +26,7 @@
   .wrap { max-width: 720px; margin: 0 auto; padding: 0 20px; }
   header { padding: 56px 0 28px; }
   .kicker { font: 500 13px/1.4 'IBM Plex Mono', monospace; letter-spacing: .16em; text-transform: uppercase; color: var(--gold); margin: 0 0 18px; }
+  .kicker .tag { text-transform: none; letter-spacing: .04em; }
   h1 { font: 800 clamp(44px, 9vw, 76px)/.92 'Barlow Condensed', sans-serif; text-transform: uppercase; margin: 0 0 20px; letter-spacing: -.005em; }
   .dek { font-size: 20px; color: var(--on-soft); margin: 0; }
   .meta { font: 400 13px 'IBM Plex Mono', monospace; color: var(--on-soft); margin-top: 22px; }
@@ -58,7 +59,7 @@
 </head>
 <body>
 <header class="wrap">
-  <p class="kicker">Flip the Switch hackathon · #HowISwitch</p>
+  <p class="kicker">Flip the Switch hackathon · <span class="tag">#HowISwitch</span></p>
   <h1>Every dish gets an owner</h1>
   <p class="dek">Building Gobble, a Thanksgiving potluck agent that keeps the list in your group chat and asks the right person about every gap.</p>
   <p class="meta">By Rofy · November 2026 · <a href="https://github.com/rofyray/gobble">github.com/rofyray/gobble</a></p>
