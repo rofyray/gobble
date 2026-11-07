@@ -4,7 +4,7 @@ Every dish gets an owner.
 
 Gobble is a potluck organizer that lives in your group chat. Guests say what they're bringing in plain words. Gobble keeps the list, checks it against the headcount, diets, allergies and the oven, and asks the right person about each gap until the plan is complete. Then it posts who's bringing what.
 
-Built for the WeMakeDevs **Flip the Switch** hackathon on [Switch](https://docs.switchagents.ai/).
+Built for the [WeMakeDevs](https://www.wemakedevs.org/) **Flip the Switch** hackathon on [Switch](https://www.switchagents.ai/).
 
 | Link | Where |
 |---|---|
